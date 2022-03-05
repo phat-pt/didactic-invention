@@ -1,5 +1,6 @@
 import logging
 import boto3
+from botocore.exceptions import ClientError
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
@@ -32,6 +33,8 @@ def _put_to_dynamodb(csv_file_count):
 
 def lambda_handler(event, context):
     LOGGER.info('Event structure: %s', event)
-    csv_file_count = _read_object(event).decode('utf8').count('\n')-1
-    LOGGER.info(str(csv_file_count))
-    _put_to_dynamodb(csv_file_count)
+    try:
+        csv_file_count = _read_object(event).decode('utf8').count('\n')-1
+        _put_to_dynamodb(csv_file_count)
+    except ClientError:
+        LOGGER.error("Failed to put record to dynamodb")

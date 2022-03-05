@@ -34,3 +34,6 @@ __init__.py
 *.ipynb
 *.csv
 *.zip
+.pytest_cache
+htmlcov
+__pycache__
