@@ -1,6 +1,6 @@
 name: Pylint, Pytest, Terraform
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -27,3 +27,10 @@ jobs:
     - name: Run with pytest
       run: |
         pytest --cov=src --cov-fail-under=100 tests/
+    
+    - name: Login with Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      
