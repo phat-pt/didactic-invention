@@ -42,13 +42,13 @@ jobs:
     - uses: hashicorp/setup-terraform@v1
     - name: Terraform init
       run: |
-        terraform init
+        terraform -chdir=terraform/ init
     
     - name: Terraform validate
       run: |
-        terraform validate
+        terraform -chdir=terraform/ validate
     
     - name: Terraform plan
       run: |
-        terraform plan
+        terraform -chdir=terraform/ plan
     
