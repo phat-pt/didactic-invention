@@ -38,5 +38,5 @@ jobs:
             AWS_ACCESS_KEY_ID: mock_access_key
             AWS_SECRET_ACCESS_KEY: mock_secret_key
           ports:
-            - '4566':'4566'
-            - '8080':'8080'
+            - 4566:4566
+            - 8080:8080
