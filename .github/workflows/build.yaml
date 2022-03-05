@@ -54,5 +54,5 @@ jobs:
 
     - name: Terraform apply
       run: |
-        terraform -chdir=terraform/ apply
+        terraform -chdir=terraform/ apply --auto-approve
     
