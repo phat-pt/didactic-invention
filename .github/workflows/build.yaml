@@ -5,6 +5,17 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          DEFAULT_REGION: ap-southeast-1
+          AWS_ACCESS_KEY_ID: mock_access_key
+          AWS_SECRET_ACCESS_KEY: mock_secret_key
+        ports:
+          - 4566:4566
+          - 4571:4571
     strategy:
       matrix:
         python-version: ["3.8"]
@@ -27,10 +38,21 @@ jobs:
     - name: Run with pytest
       run: |
         pytest --cov=src --cov-fail-under=100 tests/
+
+    - uses: hashicorp/setup-terraform@v1
+    - name: Terraform init
+      run: |
+        terraform -chdir=terraform/ init
     
-    - name: Login with Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      
+    - name: Terraform validate
+      run: |
+        terraform -chdir=terraform/ validate
+    
+    - name: Terraform plan
+      run: |
+        terraform -chdir=terraform/ plan
+
+    - name: Terraform apply
+      run: |
+        terraform -chdir=terraform/ apply --auto-approve
+    
