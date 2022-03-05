@@ -7,12 +7,12 @@ services:
     environment: 
       - AWS_DEFAULT_REGION=ap-southeast-1
       - EDGE_PORT=4566
-      - SERVICES=lambda,s3,dynamodb,iam
+      - SERVICES=cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
       - HOSTNAME_EXTERNAL=localstack
       - DEBUG=1
     ports: 
       - '4566:4566'
-      - '8080:8080'
+      - '4571:4571'
     volumes: 
       - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
