@@ -1,15 +1,14 @@
 """Parsing json to csv and parquet"""
 import logging
-import csv
-from datetime import datetime
-from urllib import response
 import boto3
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
-dynamodb_client = boto3.client('dynamodb',endpoint_url="http://host.docker.internal:4566", region_name = "ap-southeast-1")
-s3_client= boto3.client('s3',endpoint_url="http://host.docker.internal:4566", region_name = "ap-southeast-1")
+dynamodb_client = boto3.client('dynamodb',endpoint_url="http://host.docker.internal:4566",\
+     region_name = "ap-southeast-1")
+s3_client= boto3.client('s3',endpoint_url="http://host.docker.internal:4566",\
+     region_name = "ap-southeast-1")
 
 COUNTING_TABLE = 'csv_count_table'
 
@@ -23,7 +22,7 @@ def _read_object(event):
     return csv_content
 
 def _put_to_dynamodb(csv_file_count):
-    response = dynamodb_client.put_item(
+    dynamodb_client.put_item(
         TableName = COUNTING_TABLE,
         Item = {
             'row' : {
@@ -39,6 +38,3 @@ def lambda_handler(event, context):
     csv_file_count = _read_object(event).decode('utf8').count('\n')-1
     LOGGER.info(str(csv_file_count))
     _put_to_dynamodb(csv_file_count)
-    
-
-
