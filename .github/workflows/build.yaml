@@ -5,6 +5,17 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          DEFAULT_REGION: ap-southeast-1
+          AWS_ACCESS_KEY_ID: mock_access_key
+          AWS_SECRET_ACCESS_KEY: mock_secret_key
+        ports:
+          - 4566:4566
+          - 8080:8080
     strategy:
       matrix:
         python-version: ["3.8"]
@@ -27,30 +38,17 @@ jobs:
     - name: Run with pytest
       run: |
         pytest --cov=src --cov-fail-under=100 tests/
+
+    - uses: hashicorp/setup-terraform@v1
+    - name: Terraform init
+      run: |
+        terraform init
     
-    - name: Start localstack
-      services:
-        localstack:
-          image: localstack:localstack:lastest
-          env: 
-            SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
-            DEFAULT_REGION: ap-southeast-1
-            AWS_ACCESS_KEY_ID: mock_access_key
-            AWS_SECRET_ACCESS_KEY: mock_secret_key
-          ports:
-            - 4566:4566
-            - 8080:8080
-          volumes: 
-            - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
-            - "/var/run/docker.sock:/var/run/docker.sock"
-          run: |
-            # install LocalStack cli and awslocal
-            pip install localstack awscli-local[ver1]
-            # Make sure to pull the latest version of the image
-            docker pull localstack/localstack
-            # Start LocalStack in the background
-            localstack start -d
-            # Wait 30 seconds for the LocalStack container to become ready before timing out
-            echo "Waiting for LocalStack startup..."
-            localstack wait -t 30
-            echo "Startup complete"
+    - name: Terraform validate
+      run: |
+        terraform validate
+    
+    - name: Terraform plan
+      run: |
+        terraform plan
+    
