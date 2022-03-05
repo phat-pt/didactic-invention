@@ -21,7 +21,6 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 .terraform.lock.hcl
-__init__.py
 
 # Include override files you do wish to add to version control using negated pattern
 #
@@ -34,3 +33,7 @@ __init__.py
 *.ipynb
 *.csv
 *.zip
+.pytest_cache
+htmlcov
+__pycache__
+.coverage

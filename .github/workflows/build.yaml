@@ -1,0 +1,58 @@
+name: Pylint, Pytest, Terraform
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          DEFAULT_REGION: ap-southeast-1
+          AWS_ACCESS_KEY_ID: mock_access_key
+          AWS_SECRET_ACCESS_KEY: mock_secret_key
+        ports:
+          - 4566:4566
+          - 4571:4571
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Analysing the code with pylint
+      run: |
+        pylint --rcfile=pylintrc src/
+    
+    - name: Run with pytest
+      run: |
+        pytest --cov=src --cov-fail-under=100 tests/
+
+    - uses: hashicorp/setup-terraform@v1
+    - name: Terraform init
+      run: |
+        terraform -chdir=terraform/ init
+    
+    - name: Terraform validate
+      run: |
+        terraform -chdir=terraform/ validate
+    
+    - name: Terraform plan
+      run: |
+        terraform -chdir=terraform/ plan
+
+    - name: Terraform apply
+      run: |
+        terraform -chdir=terraform/ apply --auto-approve
+    
