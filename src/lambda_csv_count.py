@@ -1,4 +1,3 @@
-"""Parsing json to csv and parquet"""
 import logging
 import boto3
 
@@ -14,7 +13,6 @@ COUNTING_TABLE = 'csv_count_table'
 
 
 def _read_object(event):
-    """Read json object files"""
     bucket = event['Records'][0]['s3']['bucket']['name']
     csv_file_name = event['Records'][0]['s3']['object']['key']
     csv_file = s3_client.get_object(Bucket = bucket, Key = csv_file_name)
@@ -33,7 +31,6 @@ def _put_to_dynamodb(csv_file_count):
     LOGGER.info("Put to dynamodb")
 
 def lambda_handler(event, context):
-    """Main function"""
     LOGGER.info('Event structure: %s', event)
     csv_file_count = _read_object(event).decode('utf8').count('\n')-1
     LOGGER.info(str(csv_file_count))
