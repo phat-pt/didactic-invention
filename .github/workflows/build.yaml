@@ -29,3 +29,17 @@ jobs:
         pytest --cov=src --cov-fail-under=100 tests/
     
     - name: Start localstack
+      services:
+        localstack:
+          image: localstack:localstack:lastest
+          env: 
+            SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+            DEFAULT_REGION: ap-southeast-1
+            AWS_ACCESS_KEY_ID: mock_access_key
+            AWS_SECRET_ACCESS_KEY: mock_secret_key
+          ports:
+            - '4566':'4566'
+            - '8080':'8080'
+          volumes: 
+            - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
+            - "/var/run/docker.sock:/var/run/docker.sock"
