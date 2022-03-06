@@ -32,7 +32,7 @@ jobs:
 
     - name: Cache Poetry virtualenv
       uses: actions/cache@v2
-        with:
+      with:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
