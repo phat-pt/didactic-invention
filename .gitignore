@@ -37,4 +37,3 @@ override.tf.json
 htmlcov
 __pycache__
 .coverage
-poetry.lock
