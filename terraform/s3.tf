@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "athena_query_s3" {
 }
 
 resource "aws_s3_bucket_public_access_block" "athena_query_s3" {
-  bucket                  = aws_s3_bucket.athena_query_s3[0].id
+  bucket                  = aws_s3_bucket.athena_query_s3[*].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
