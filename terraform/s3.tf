@@ -6,13 +6,9 @@ resource "aws_s3_bucket" "csv_bucket" {
 }
 
 
-data "aws_s3_bucket" "athena_query_s3_bucket"{
-  bucket= "aws-athena-query-results-s3"
-}
-
 resource "aws_s3_bucket" "athena_query_s3" {
   count = var.environment == "qa" ? 0 : 1
-  bucket = data.aws_s3_bucket.athena_query_s3_bucket.bucket
+  bucket = "aws-athena-query-results-s3"
 }
 
 resource "aws_s3_bucket_public_access_block" "athena_query_s3" {
