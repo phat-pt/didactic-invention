@@ -1,4 +1,4 @@
-name: Pylint, Pytest, Terraform
+name: Poetry, Pylint, Pytest, Terraform
 
 on: [push, pull_request]
 
@@ -24,25 +24,32 @@ jobs:
       with:
         python-version: "3.8"
 
-    - name: Install Poetry
-      uses: dschep/install-poetry-action@v1.2
+    - name: Install Poetry Action
+      uses: snok/install-poetry@v1.3.1
+      with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
     - name: Cache Poetry virtualenv
-      uses: actions/cache@v1
-      id: cache
+      uses: actions/cache@v2
       with:
-        path: ~/.virtualenvs
-        key: poetry-$
-        restore-keys: |
-          poetry-$
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    - name: Install library
+      run: poetry install --no-interaction
 
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=pylintrc src/
+        poetry run pylint --rcfile=pylintrc src/
     
     - name: Run with pytest
       run: |
-        pytest --cov=src --cov-fail-under=100 tests/
+        poetry run pytest --cov=src --cov-fail-under=100 tests/
 
     - uses: hashicorp/setup-terraform@v1
     - name: Terraform init
